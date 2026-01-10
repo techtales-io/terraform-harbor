@@ -1,8 +1,31 @@
 terraform {
   required_providers {
     harbor = {
-      source = "goharbor/harbor"
+      source  = "goharbor/harbor"
       version = "3.10.17"
+    }
+    vault = {
+      source  = "hashicorp/vault"
+      version = "3.10.0"
+    }
+  }
+}
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# CONFIGURE TERRAFORM
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+terraform {
+  required_version = ">= 1.9.0, <= 1.14.3"
+  required_providers {
+    # https://registry.terraform.io/providers/goharbor/harbor/latest/docs
+    harbor = {
+      source  = "goharbor/harbor"
+      version = "3.10.17"
+    }
+    # https://registry.terraform.io/providers/hashicorp/vault/latest/docs
+    vault = {
+      source  = "hashicorp/vault"
+      version = "5.6.0"
     }
   }
 }
@@ -78,7 +101,7 @@ resource "harbor_project" "proxy-docker-io" {
   storage_quota               = -1
   deployment_security         = null
   cve_allowlist               = []
-  registry_id = harbor_registry.docker_hub_proxy.registry_id
+  registry_id                 = harbor_registry.docker_hub_proxy.registry_id
 }
 
 # https://registry.terraform.io/providers/goharbor/harbor/latest/docs/resources/project
@@ -92,7 +115,7 @@ resource "harbor_project" "proxy-quay-io" {
   storage_quota               = -1
   deployment_security         = null
   cve_allowlist               = []
-  registry_id = harbor_registry.quay_proxy.registry_id
+  registry_id                 = harbor_registry.quay_proxy.registry_id
 }
 
 # https://registry.terraform.io/providers/goharbor/harbor/latest/docs/resources/project
@@ -106,5 +129,5 @@ resource "harbor_project" "proxy-ghcr-io" {
   storage_quota               = -1
   deployment_security         = null
   cve_allowlist               = []
-  registry_id = harbor_registry.ghcr_proxy.registry_id
+  registry_id                 = harbor_registry.ghcr_proxy.registry_id
 }

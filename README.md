@@ -25,8 +25,6 @@ Harbor as code with Terraform.
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-- [Concept](#concept)
-  - [Policy](#policy)
 - [Usage](#usage)
 - [Code-Style](#code-style)
   - [Terraform](#terraform)
@@ -77,13 +75,13 @@ task pre-commit:init
 
 ## ENV
 
-| Name                    | Description                             |
-| ----------------------- | --------------------------------------- |
-| `VAULT_ADDR`            | the vault or openbao instance address   |
-| `AWS_ENDPOINT_URL_S3`   | endpoint url for the s3 state backend   |
-| `AWS_REGION`            | region for the s3 state backend         |
-| `AWS_ACCESS_KEY_ID`     | username for the s3 state backend       |
-| `AWS_SECRET_ACCESS_KEY` | password for the s3 state backend       |
+| Name                    | Description                           |
+| ----------------------- | ------------------------------------- |
+| `VAULT_ADDR`            | the vault or openbao instance address |
+| `AWS_ENDPOINT_URL_S3`   | endpoint url for the s3 state backend |
+| `AWS_REGION`            | region for the s3 state backend       |
+| `AWS_ACCESS_KEY_ID`     | username for the s3 state backend     |
+| `AWS_SECRET_ACCESS_KEY` | password for the s3 state backend     |
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->

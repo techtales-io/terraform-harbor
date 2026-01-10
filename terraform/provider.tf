@@ -10,5 +10,5 @@ data "vault_generic_secret" "terraform_harbor" {
 provider "harbor" {
   username = data.vault_generic_secret.terraform_harbor.data["username"]
   password = data.vault_generic_secret.terraform_harbor.data["password"]
-  url = data.vault_generic_secret.terraform_harbor.data["url"]
+  url      = data.vault_generic_secret.terraform_harbor.data["url"]
 }
