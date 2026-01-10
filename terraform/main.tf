@@ -1,16 +1,3 @@
-terraform {
-  required_providers {
-    harbor = {
-      source  = "goharbor/harbor"
-      version = "3.10.17"
-    }
-    vault = {
-      source  = "hashicorp/vault"
-      version = "3.10.0"
-    }
-  }
-}
-
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # CONFIGURE TERRAFORM
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -46,13 +33,11 @@ resource "harbor_registry" "ghcr_proxy" {
 }
 
 # https://registry.terraform.io/providers/goharbor/harbor/latest/docs/resources/registry
-# not working anymore out of the box
-# FIXME
-# resource "harbor_registry" "quay_proxy" {
-#   provider_name = "quay"
-#   name          = "quay"
-#   endpoint_url  = "https://quay.io"
-# }
+resource "harbor_registry" "quay_proxy" {
+  provider_name = "quay"
+  name          = "quay"
+  endpoint_url  = "https://quay.io"
+}
 
 # https://registry.terraform.io/providers/goharbor/harbor/latest/docs/resources/project
 resource "harbor_project" "main" {
@@ -105,18 +90,20 @@ resource "harbor_project" "proxy-docker-io" {
 }
 
 # https://registry.terraform.io/providers/goharbor/harbor/latest/docs/resources/project
-resource "harbor_project" "proxy-quay-io" {
-  name                        = "proxy-quay.io"
-  public                      = true
-  vulnerability_scanning      = false
-  enable_content_trust        = false
-  enable_content_trust_cosign = false
-  auto_sbom_generation        = true
-  storage_quota               = -1
-  deployment_security         = null
-  cve_allowlist               = []
-  registry_id                 = harbor_registry.quay_proxy.registry_id
-}
+# not working anymore out of the box
+# FIXME: quay.io has been deprectated in harbor
+# resource "harbor_project" "proxy-quay-io" {
+#   name                        = "proxy-quay.io"
+#   public                      = true
+#   vulnerability_scanning      = false
+#   enable_content_trust        = false
+#   enable_content_trust_cosign = false
+#   auto_sbom_generation        = true
+#   storage_quota               = -1
+#   deployment_security         = null
+#   cve_allowlist               = []
+#   registry_id                 = harbor_registry.quay_proxy.registry_id
+# }
 
 # https://registry.terraform.io/providers/goharbor/harbor/latest/docs/resources/project
 resource "harbor_project" "proxy-ghcr-io" {
