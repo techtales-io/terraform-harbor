@@ -18,7 +18,7 @@
 
 # Terraform Harbor for techtales.io
 
-Harbor  as code with Terraform.
+Harbor as code with Terraform.
 
 <details>
   <summary style="font-size:1.2em;">Table of Contents</summary>
@@ -37,36 +37,6 @@ Harbor  as code with Terraform.
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 </details>
-
-## Concept
-
-### Policy
-
-#### Users
-
-Real users will access buckets by the following pattern:
-
-> $BUCKET/$USER/\*
-
-Example: backup/tyriis/android, documents/jazzlyn/
-
-#### Groups
-
-Member of groups will access buckets by the following pattern:
-
-> $BUCKET/$GROUP/\*
-
-Example: documents/techtales/, documents/familly/
-
-#### K8s services and service accounts
-
-K8s services will access buckets by the following pattern:
-
-> $CLUSTER/$SERVICE/\*
-
-Example: k3s.home/node-red/data
-
-ToDo: check if it would be better to create a bucket for each service
 
 ## Usage
 
@@ -109,15 +79,11 @@ task pre-commit:init
 
 | Name                    | Description                             |
 | ----------------------- | --------------------------------------- |
-| `VAULT_TOKEN`           | vault token                             |
+| `VAULT_ADDR`            | the vault or openbao instance address   |
 | `AWS_ENDPOINT_URL_S3`   | endpoint url for the s3 state backend   |
 | `AWS_REGION`            | region for the s3 state backend         |
 | `AWS_ACCESS_KEY_ID`     | username for the s3 state backend       |
 | `AWS_SECRET_ACCESS_KEY` | password for the s3 state backend       |
-| `MINIO_ENDPOINT`        | the minio endpoint FQDN without http(s) |
-| `MINIO_USER`            | the minio admin username                |
-| `MINIO_PASSWORD`        | the minio admin password                |
-| `MINIO_ENABLE_HTTPS`    | should be true                          |
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
