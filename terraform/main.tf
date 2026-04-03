@@ -7,7 +7,7 @@ terraform {
     # https://registry.terraform.io/providers/goharbor/harbor/latest/docs
     harbor = {
       source  = "goharbor/harbor"
-      version = "3.11.3"
+      version = "3.11.5"
     }
     # https://registry.terraform.io/providers/hashicorp/vault/latest/docs
     vault = {
