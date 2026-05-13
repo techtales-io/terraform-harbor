@@ -3,7 +3,7 @@ experimental = true
 legacy_version_file_disable_tools = ['terraform']
 
 [tools]
-terraform = "1.15.2"
+terraform = "1.15.3"
 trivy = "0.69.1"
 terraform-docs = "0.24.0"
 pre-commit = "4.6.0"
