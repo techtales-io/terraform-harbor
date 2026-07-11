@@ -2,12 +2,12 @@
 # CONFIGURE TERRAFORM
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 terraform {
-  required_version = ">= 1.9.0, <= 1.15.7"
+  required_version = ">= 1.9.0, <= 1.15.8"
   required_providers {
     # https://registry.terraform.io/providers/goharbor/harbor/latest/docs
     harbor = {
       source  = "goharbor/harbor"
-      version = "3.12.0"
+      version = "3.12.1"
     }
     # https://registry.terraform.io/providers/hashicorp/vault/latest/docs
     vault = {
