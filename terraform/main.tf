@@ -123,6 +123,12 @@ resource "harbor_project" "proxy-ghcr-io" {
 # ROBOT ACCOUNTS
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+# bump `input` to rotate the jarvis robot secret: the robot is then replaced on
+# apply and harbor issues a new secret, which the vault resource below records
+resource "terraform_data" "jarvis_robot_secret_version" {
+  input = 1
+}
+
 # https://registry.terraform.io/providers/goharbor/harbor/latest/docs/resources/robot_account
 # harbor generates the secret once on creation, terraform only reads it back
 # login name is not `name` but `full_name`, e.g. robot$main+jarvis
@@ -141,6 +147,9 @@ resource "harbor_robot_account" "jarvis" {
     }
     kind      = "project"
     namespace = harbor_project.main.name
+  }
+  lifecycle {
+    replace_triggered_by = [terraform_data.jarvis_robot_secret_version]
   }
 }
 
