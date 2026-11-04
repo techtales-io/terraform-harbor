@@ -130,19 +130,19 @@ resource "harbor_project" "proxy-ghcr-io" {
 
 # the secret is generated on every run and never persisted: it only reaches the
 # write-only arguments below (harbor secret_wo and vault data_json_wo)
-ephemeral "random_password" "main_ci_pusher" {
+ephemeral "random_password" "jarvis" {
   length           = 32
   special          = true
   override_special = "!#$%&*()-_=+[]{}<>:?"
 }
 
 # https://registry.terraform.io/providers/goharbor/harbor/latest/docs/resources/robot_account
-# login name is not `name` but `full_name`, e.g. robot$main+ci-pusher
-resource "harbor_robot_account" "main_ci_pusher" {
-  name              = "ci-pusher"
+# login name is not `name` but `full_name`, e.g. robot$main+jarvis
+resource "harbor_robot_account" "jarvis" {
+  name              = "jarvis"
   description       = "agent robot account: build and push images into main"
   level             = "project"
-  secret_wo         = ephemeral.random_password.main_ci_pusher.result
+  secret_wo         = ephemeral.random_password.jarvis.result
   secret_wo_version = 1
   permissions {
     access {
@@ -159,13 +159,13 @@ resource "harbor_robot_account" "main_ci_pusher" {
 }
 
 # https://registry.terraform.io/providers/hashicorp/vault/latest/docs/resources/kv_secret_v2
-resource "vault_kv_secret_v2" "harbor_robot_main_ci_pusher" {
+resource "vault_kv_secret_v2" "harbor_robot_jarvis" {
   mount               = "infra"
   name                = "harbor"
   delete_all_versions = true
   data_json_wo = jsonencode({
-    username = harbor_robot_account.main_ci_pusher.full_name
-    password = ephemeral.random_password.main_ci_pusher.result
+    username = harbor_robot_account.jarvis.full_name
+    password = ephemeral.random_password.jarvis.result
     registry = data.vault_generic_secret.terraform_harbor.data["url"]
   })
   data_json_wo_version = 1
