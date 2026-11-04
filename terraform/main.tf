@@ -161,7 +161,7 @@ resource "harbor_robot_account" "main_ci_pusher" {
 # https://registry.terraform.io/providers/hashicorp/vault/latest/docs/resources/kv_secret_v2
 resource "vault_kv_secret_v2" "harbor_robot_main_ci_pusher" {
   mount               = "infra"
-  name                = "techtales/harbor/robot/main-ci-pusher"
+  name                = "harbor"
   delete_all_versions = true
   data_json_wo = jsonencode({
     username = harbor_robot_account.main_ci_pusher.full_name
