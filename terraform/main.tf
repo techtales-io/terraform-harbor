@@ -2,17 +2,12 @@
 # CONFIGURE TERRAFORM
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 terraform {
-  required_version = ">= 1.11.0, <= 1.17.1"
+  required_version = ">= 1.9.0, <= 1.17.1"
   required_providers {
     # https://registry.terraform.io/providers/goharbor/harbor/latest/docs
     harbor = {
       source  = "goharbor/harbor"
       version = "3.12.5"
-    }
-    # https://registry.terraform.io/providers/hashicorp/random/latest/docs
-    random = {
-      source  = "hashicorp/random"
-      version = ">= 3.7.0"
     }
     # https://registry.terraform.io/providers/hashicorp/vault/latest/docs
     vault = {
@@ -128,22 +123,13 @@ resource "harbor_project" "proxy-ghcr-io" {
 # ROBOT ACCOUNTS
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# the secret is generated on every run and never persisted: it only reaches the
-# write-only arguments below (harbor secret_wo and vault data_json_wo)
-ephemeral "random_password" "jarvis" {
-  length           = 32
-  special          = true
-  override_special = "!#$%&*()-_=+[]{}<>:?"
-}
-
 # https://registry.terraform.io/providers/goharbor/harbor/latest/docs/resources/robot_account
+# harbor generates the secret once on creation, terraform only reads it back
 # login name is not `name` but `full_name`, e.g. robot$main+jarvis
 resource "harbor_robot_account" "jarvis" {
-  name              = "jarvis"
-  description       = "agent robot account: build and push images into main"
-  level             = "project"
-  secret_wo         = ephemeral.random_password.jarvis.result
-  secret_wo_version = 1
+  name        = "jarvis"
+  description = "agent robot account: build and push images into main"
+  level       = "project"
   permissions {
     access {
       action   = "pull"
@@ -163,10 +149,9 @@ resource "vault_kv_secret_v2" "harbor_robot_jarvis" {
   mount               = "infra"
   name                = "harbor"
   delete_all_versions = true
-  data_json_wo = jsonencode({
+  data_json = jsonencode({
     username = harbor_robot_account.jarvis.full_name
-    password = ephemeral.random_password.jarvis.result
+    password = harbor_robot_account.jarvis.secret
     registry = data.vault_generic_secret.terraform_harbor.data["url"]
   })
-  data_json_wo_version = 1
 }
