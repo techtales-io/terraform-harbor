@@ -2,12 +2,17 @@
 # CONFIGURE TERRAFORM
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 terraform {
-  required_version = ">= 1.9.0, <= 1.17.1"
+  required_version = ">= 1.11.0, <= 1.17.1"
   required_providers {
     # https://registry.terraform.io/providers/goharbor/harbor/latest/docs
     harbor = {
       source  = "goharbor/harbor"
       version = "3.12.5"
+    }
+    # https://registry.terraform.io/providers/hashicorp/random/latest/docs
+    random = {
+      source  = "hashicorp/random"
+      version = ">= 3.7.0"
     }
     # https://registry.terraform.io/providers/hashicorp/vault/latest/docs
     vault = {
@@ -117,4 +122,51 @@ resource "harbor_project" "proxy-ghcr-io" {
   deployment_security         = null
   cve_allowlist               = []
   registry_id                 = harbor_registry.ghcr_proxy.registry_id
+}
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ROBOT ACCOUNTS
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# the secret is generated on every run and never persisted: it only reaches the
+# write-only arguments below (harbor secret_wo and vault data_json_wo)
+ephemeral "random_password" "main_ci_pusher" {
+  length           = 32
+  special          = true
+  override_special = "!#$%&*()-_=+[]{}<>:?"
+}
+
+# https://registry.terraform.io/providers/goharbor/harbor/latest/docs/resources/robot_account
+# login name is not `name` but `full_name`, e.g. robot$main+ci-pusher
+resource "harbor_robot_account" "main_ci_pusher" {
+  name              = "ci-pusher"
+  description       = "agent robot account: build and push images into main"
+  level             = "project"
+  secret_wo         = ephemeral.random_password.main_ci_pusher.result
+  secret_wo_version = 1
+  permissions {
+    access {
+      action   = "pull"
+      resource = "repository"
+    }
+    access {
+      action   = "push"
+      resource = "repository"
+    }
+    kind      = "project"
+    namespace = harbor_project.main.name
+  }
+}
+
+# https://registry.terraform.io/providers/hashicorp/vault/latest/docs/resources/kv_secret_v2
+resource "vault_kv_secret_v2" "harbor_robot_main_ci_pusher" {
+  mount               = "infra"
+  name                = "techtales/harbor/robot/main-ci-pusher"
+  delete_all_versions = true
+  data_json_wo = jsonencode({
+    username = harbor_robot_account.main_ci_pusher.full_name
+    password = ephemeral.random_password.main_ci_pusher.result
+    registry = data.vault_generic_secret.terraform_harbor.data["url"]
+  })
+  data_json_wo_version = 1
 }
