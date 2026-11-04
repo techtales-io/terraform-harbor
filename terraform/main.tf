@@ -147,7 +147,7 @@ resource "harbor_robot_account" "jarvis" {
 # https://registry.terraform.io/providers/hashicorp/vault/latest/docs/resources/kv_secret_v2
 resource "vault_kv_secret_v2" "harbor_robot_jarvis" {
   mount               = "infra"
-  name                = "harbor"
+  name                = "harbor/jarvis"
   delete_all_versions = true
   data_json = jsonencode({
     username = harbor_robot_account.jarvis.full_name
