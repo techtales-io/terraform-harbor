@@ -118,3 +118,40 @@ resource "harbor_project" "proxy-ghcr-io" {
   cve_allowlist               = []
   registry_id                 = harbor_registry.ghcr_proxy.registry_id
 }
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ROBOT ACCOUNTS
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# https://registry.terraform.io/providers/goharbor/harbor/latest/docs/resources/robot_account
+# harbor generates the secret once on creation, terraform only reads it back
+# login name is not `name` but `full_name`, e.g. robot$main+jarvis
+resource "harbor_robot_account" "jarvis" {
+  name        = "jarvis"
+  description = "agent robot account: build and push images into main"
+  level       = "project"
+  permissions {
+    access {
+      action   = "pull"
+      resource = "repository"
+    }
+    access {
+      action   = "push"
+      resource = "repository"
+    }
+    kind      = "project"
+    namespace = harbor_project.main.name
+  }
+}
+
+# https://registry.terraform.io/providers/hashicorp/vault/latest/docs/resources/kv_secret_v2
+resource "vault_kv_secret_v2" "harbor_robot_jarvis" {
+  mount               = "infra"
+  name                = "harbor/jarvis"
+  delete_all_versions = true
+  data_json = jsonencode({
+    username = harbor_robot_account.jarvis.full_name
+    password = harbor_robot_account.jarvis.secret
+    registry = data.vault_generic_secret.terraform_harbor.data["url"]
+  })
+}
